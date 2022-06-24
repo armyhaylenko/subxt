@@ -23,6 +23,7 @@ use sp_runtime::traits::{
     IdentifyAccount,
     Verify,
 };
+use std::sync::Arc;
 
 /// Signing transactions requires a [`Signer`]. This is responsible for
 /// providing the "from" account that the transaction is being signed by,
@@ -50,7 +51,7 @@ pub trait Signer<T: Config> {
 pub struct PairSigner<T: Config, P: Pair> {
     account_id: T::AccountId,
     nonce: Option<T::Index>,
-    signer: P,
+    signer: Arc<P>,
 }
 
 impl<T, P> PairSigner<T, P>
@@ -62,7 +63,7 @@ where
     P: Pair,
 {
     /// Creates a new [`Signer`] from a [`Pair`].
-    pub fn new(signer: P) -> Self {
+    pub fn new(signer: Arc<P>) -> Self {
         let account_id =
             <T::Signature as Verify>::Signer::from(signer.public()).into_account();
         Self {
